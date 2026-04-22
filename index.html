@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUENTOS ÉPICOS</title>
+</head>
+
+<body style="font-family: Arial; text-align:center; padding:40px;">
+
+<h1>🚀 Generador de Cuentos</h1>
+
+<button onclick="generateStory()">Generar cuento</button>
+
+<div id="output" style="margin-top:30px;"></div>
+
+<br><br>
+
+<textarea id="respuesta" placeholder="Escribe tu respuesta"></textarea><br>
+<button onclick="sendAnswer()">Enviar respuesta</button>
+
+<div id="respuestaIA"></div>
+
+<script>
+
+async function generateStory() {
+  const output = document.getElementById("output");
+  output.innerHTML = "⏳ Generando cuento...";
+
+  try {
+    const res = await fetch("/.netlify/functions/generate-story", {
+      method: "POST"
+    });
+
+    const data = await res.json();
+
+    output.innerHTML = data.mensaje || "Funciona pero sin historia aún";
+
+  } catch (e) {
+    output.innerHTML = "❌ Error conectando con función";
+    console.error(e);
+  }
+}
+
+async function sendAnswer() {
+  const texto = document.getElementById("respuesta").value;
+  const box = document.getElementById("respuestaIA");
+
+  box.innerHTML = "⏳ Pensando...";
+
+  try {
+    const res = await fetch("/.netlify/functions/reply-story", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ texto })
+    });
+
+    const data = await res.json();
+
+    box.innerHTML = data.mensaje || "Respuesta recibida";
+
+  } catch (e) {
+    box.innerHTML = "❌ Error";
+  }
+}
+
+</script>
+
+</body>
+</html>
